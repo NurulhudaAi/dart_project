@@ -20,7 +20,7 @@ void main() async {
 
   final body = {'username': username, 'password': password};
   //URL
-  final url = Uri.parse('http://localhost:3000/login');
+  final url = Uri.parse('http://localhost:8000/login');
   final response = await http.post(url, body: body);
 
   if (response.statusCode == 200) {
@@ -68,7 +68,7 @@ Future<void> showTrackingApp(int userId) async {
 
 // Function to show all expenses
 Future<void> showAllExpenses(int userId) async {
-  final url = Uri.parse('http://localhost:3000/expenses/$userId');
+  final url = Uri.parse('http://localhost:8000/expenses/$userId');
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
@@ -95,7 +95,7 @@ Future<void> showAllExpenses(int userId) async {
 
 // Function to show today's expenses
 Future<void> showTodayExpenses(int userId) async {
-  final url = Uri.parse('http://localhost:3000/expenses/$userId/today');
+  final url = Uri.parse('http://localhost:8000/expenses/$userId/today');
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
