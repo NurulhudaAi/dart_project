@@ -121,3 +121,48 @@ Future<void> showTodayExpenses(int userId) async {
     print('Error: ${response.statusCode}');
   }
 }
+
+// function for Search expenses by keyword
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// function for Add new expense
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Fuction for Delte expense by id

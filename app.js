@@ -64,3 +64,31 @@ app.get('/expenses/:userId/today', (req, res) => {
     res.status(200).json(results);
   });
 })
+
+// endpoint for Search expenses by item name
+
+
+
+
+
+
+
+
+
+
+
+// endponint for add new expense
+
+
+
+
+
+
+
+
+
+
+
+
+
+// endpoint for delete expense by id
