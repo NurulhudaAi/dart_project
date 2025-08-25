@@ -46,7 +46,7 @@ Future<void> showTrackingApp(int userId, String username) async {
   while (true) {
     print('================== Expenses Tracking App ==================');
     print('Welcome $username');
-    print('1. Show all');
+    print('1. All expenses');
     print('2. Today\'s expenses');
     print('3. Exit');
     stdout.write('Choose... ');
@@ -74,16 +74,15 @@ Future<void> showAllExpenses(int userId) async {
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
-    final result = jsonDecode(response.body) as List;
+    final jsonResult = json.decode(response.body) as List;
 
     int total = 0;
     print('---------------------- All expenses ----------------------');
-    for (int i = 0; i < result.length; i++) {
-      final exp = result[i];
+    for (var exp in jsonResult) {
       final dt = DateTime.parse(exp["date"]);
       final dtaLocal = dt.toLocal();
       print(
-        '${i + 1}. ${exp["item"]} : ${exp["paid"]}฿ : ${dtaLocal.toString()}',
+        '${exp["id"]}. ${exp["item"]} : ${exp["paid"]}฿ : ${dtaLocal.toString()}',
       );
       total += exp['paid'] as int;
     }
@@ -101,16 +100,15 @@ Future<void> showTodayExpenses(int userId) async {
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
-    final result = jsonDecode(response.body) as List;
+    final jsonResult = jsonDecode(response.body) as List;
 
     int total = 0;
     print('---------------------- Today\'s expenses ----------------------');
-    for (int i = 0; i < result.length; i++) {
-      final exp = result[i];
+    for (var exp in jsonResult) {
       final dt = DateTime.parse(exp["date"]);
       final dtaLocal = dt.toLocal();
       print(
-        '${i + 1}. ${exp["item"]} : ${exp["paid"]}฿ : ${dtaLocal.toString()}',
+        '${exp["id"]}. ${exp["item"]} : ${exp["paid"]}฿ : ${dtaLocal.toString()}',
       );
       total += exp['paid'] as int;
     }
