@@ -29,8 +29,9 @@ void main() async {
 
     // Get userId from response
     final userId = result['userId'];
+    final nameUser = result['username'] ?? username;
     if (userId != null) {
-      await showTrackingApp(userId as int);
+      await showTrackingApp(userId as int, nameUser as String);
     }
   } else if (response.statusCode == 401 || response.statusCode == 500) {
     final result = response.body;
@@ -41,9 +42,10 @@ void main() async {
 }
 
 // fuction Show Menu
-Future<void> showTrackingApp(int userId) async {
+Future<void> showTrackingApp(int userId, String username) async {
   while (true) {
     print('================== Expenses Tracking App ==================');
+    print('Welcome $username');
     print('1. Show all');
     print('2. Today\'s expenses');
     print('3. Exit');
