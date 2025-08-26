@@ -3,8 +3,6 @@ import 'package:http/http.dart' as http;
 import 'dart:io';
 const String API_BASE = 'http://localhost:8000';
 
-const String API_BASE = 'http://localhost:8000';
-
 void main() async {
   print('===== Login =====');
   // Get username and password
@@ -218,7 +216,6 @@ Future<void> addExpense(int userId) async {
 Future<bool> deleteExpenseById(int userId, int expenseId) async {
   try {
     final url = Uri.parse('$API_BASE/expenses/$userId/$expenseId');
-
     final res = await http.delete(url);
     if (res.statusCode == 200 || res.statusCode == 204) return true;
     if (res.statusCode == 404) { print('No expense with id $expenseId'); return false; }
@@ -226,4 +223,3 @@ Future<bool> deleteExpenseById(int userId, int expenseId) async {
     return false;
   } catch (e) { print('Delete failed: $e'); return false; }
 }
-
