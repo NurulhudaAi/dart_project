@@ -6,6 +6,3 @@
 3. Teeradet Khonyuen 6631501058
 4. Phloiphailin Khampuk 6631501081
 
-
-A sample command-line application with an entrypoint in `bin/`, library code
-in `lib/`, and example unit test in `test/`.
