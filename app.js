@@ -40,7 +40,7 @@ app.post('/login', (req, res) => {
 //endpoint for each userid's expenses
 app.get('/expenses/:userId', (req, res) => {
   const userId = req.params.userId;
-  const sql = 'SELECT item, paid, DATE_FORMAT(date, "%Y-%m-%d %H:%i:%s.000") as date FROM expense WHERE user_id = ?';
+  const sql = 'SELECT id, item, paid, DATE_FORMAT(date, "%Y-%m-%d %H:%i:%s.000") as date FROM expense WHERE user_id = ?';
 
 
   conn.query(sql, [userId], (err, results) => {
@@ -55,7 +55,7 @@ app.get('/expenses/:userId', (req, res) => {
 // endpoint for today's user expenses
 app.get('/expenses/:userId/today', (req, res) => {
   const userId = req.params.userId;
-  const sql = 'SELECT item, paid, DATE_FORMAT(date, "%Y-%m-%d %H:%i:%s.000") as date FROM expense WHERE user_id = ? AND DATE(date) = CURDATE()';
+  const sql = 'SELECT id, item, paid, DATE_FORMAT(date, "%Y-%m-%d %H:%i:%s.000") as date FROM expense WHERE user_id = ? AND DATE(date) = CURDATE()';
 
   conn.query(sql, [userId], (err, results) => {
     if (err) {
@@ -66,7 +66,26 @@ app.get('/expenses/:userId/today', (req, res) => {
 })
 
 // endpoint for Search expenses by item name
+// GET /expenses/:userId/search?q=coffee
+app.get('/expenses/:userId/search', (req, res) => {
+  const userId = req.params.userId;
+  const q = (req.query.q || '').trim();
+  if (!q) return res.status(400).send('Missing search keyword');
 
+  const like = `%${q}%`;
+  const sql = `
+    SELECT id, item, paid,
+           DATE_FORMAT(date, "%Y-%m-%d %H:%i:%s.000") AS date
+    FROM expense
+    WHERE user_id = ? AND item LIKE ?
+    ORDER BY date DESC
+  `;
+  conn.query(sql, [userId, like], (err, results) => {
+    if (err) return res.status(500).send('Database error!');
+    if (!results.length) return res.status(404).send('No matching expenses.');
+    res.status(200).json(results);
+  });
+});
 
 
 
@@ -78,18 +97,31 @@ app.get('/expenses/:userId/today', (req, res) => {
 
 
 // endponint for add new expense
+app.post('/expenses', (req, res) => {
+  const { item, paid, user_id } = req.body;
 
+  // validate เบื้องต้น
+  if (!item || item.trim() === '' || paid === undefined || user_id === undefined) {
+    return res.status(400).send('Missing required fields (item, paid, user_id)');
+  }
 
-
-
-
-
-
-
-
-
-
-
+  const sql = 'INSERT INTO expense (item, paid, date, user_id) VALUES (?, ?, NOW(), ?)';
+  conn.query(sql, [item.trim(), Number(paid), Number(user_id)], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Database error!');
+    }
+    // ส่งข้อมูลรายการที่เพิ่งสร้างกลับไป
+    res.status(201).json({
+      id: result.insertId,
+      item: item.trim(),
+      paid: Number(paid),
+      user_id: Number(user_id),
+      // ให้รูปแบบเวลา ISO (ฝั่ง Dart แปลงได้)
+      date: new Date().toISOString()
+    });
+  });
+});
 
 // DELETE EXPENSE 
 app.delete('/expenses/:userId/:expenseId', (req, res) => {
