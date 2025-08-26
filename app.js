@@ -126,3 +126,13 @@ app.post('/expenses', (req, res) => {
 });
 
 // DELETE EXPENSE 
+app.delete('/expenses/:userId/:expenseId', (req, res) => {
+  const { userId, expenseId } = req.params;
+  const sql = 'DELETE FROM expense WHERE user_id = ? AND id = ?';
+  conn.query(sql, [userId, expenseId], (err, result) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    if (result.affectedRows === 0) return res.status(404).send('Not found');
+    return res.status(204).send();
+  });
+});
+

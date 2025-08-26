@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:io';
-
-const String API_BASE = 'http://localhost:8000';
+const API_BASE = 'http://localhost:8000';
 
 void main() async {
   print('===== Login =====');
@@ -153,10 +152,14 @@ Future<void> searchExpenses(int userId) async {
     return;
   }
 
+
   // Use 'q' as the query parameter
   final url = Uri.parse(
     '$API_BASE/expenses/$userId/search',
   ).replace(queryParameters: {'q': keyword});
+  // Use only one correct URL, with 'q' as the query parameter
+  final url = Uri.parse('$API_BASE/expenses/$userId/search').replace(queryParameters: {'q': keyword});
+
 
   try {
     final res = await http.get(url);
@@ -170,13 +173,14 @@ Future<void> searchExpenses(int userId) async {
 
       if (data.isEmpty) {
         print('No item: $keyword');
+
+        print('No item containing that searching keyword.');
+
         return;
       }
 
       int total = 0;
-      print(
-        '---------------------- Search results for "$keyword" ----------------------',
-      );
+      print('---------------------- Search results for "$keyword" ----------------------');
       for (var exp in data) {
         final id = exp['id'];
         final item = exp['item'];
@@ -238,18 +242,10 @@ Future<void> addExpense(int userId) async {
 Future<bool> deleteExpenseById(int userId, int expenseId) async {
   try {
     final url = Uri.parse('$API_BASE/expenses/$userId/$expenseId');
-
     final res = await http.delete(url);
-
     if (res.statusCode == 200 || res.statusCode == 204) return true;
-    if (res.statusCode == 404) {
-      print('No expense with id $expenseId');
-      return false;
-    }
+    if (res.statusCode == 404) { print('No expense with id $expenseId'); return false; }
     print('Error: ${res.statusCode} ${res.body}');
     return false;
-  } catch (e) {
-    print('Delete failed: $e');
-    return false;
-  }
+  } catch (e) { print('Delete failed: $e'); return false; }
 }
