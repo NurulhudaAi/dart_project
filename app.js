@@ -40,7 +40,7 @@ app.post('/login', (req, res) => {
 //endpoint for each userid's expenses
 app.get('/expenses/:userId', (req, res) => {
   const userId = req.params.userId;
-  const sql = 'SELECT item, paid, DATE_FORMAT(date, "%Y-%m-%d %H:%i:%s.000") as date FROM expense WHERE user_id = ?';
+  const sql = 'SELECT id, item, paid, DATE_FORMAT(date, "%Y-%m-%d %H:%i:%s.000") as date FROM expense WHERE user_id = ?';
 
 
   conn.query(sql, [userId], (err, results) => {
@@ -55,7 +55,7 @@ app.get('/expenses/:userId', (req, res) => {
 // endpoint for today's user expenses
 app.get('/expenses/:userId/today', (req, res) => {
   const userId = req.params.userId;
-  const sql = 'SELECT item, paid, DATE_FORMAT(date, "%Y-%m-%d %H:%i:%s.000") as date FROM expense WHERE user_id = ? AND DATE(date) = CURDATE()';
+  const sql = 'SELECT id, item, paid, DATE_FORMAT(date, "%Y-%m-%d %H:%i:%s.000") as date FROM expense WHERE user_id = ? AND DATE(date) = CURDATE()';
 
   conn.query(sql, [userId], (err, results) => {
     if (err) {
