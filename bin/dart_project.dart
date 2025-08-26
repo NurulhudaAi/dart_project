@@ -170,20 +170,12 @@ Future<void> showTodayExpenses(int userId) async {
 // Fuction for Delte expense by id
 Future<bool> deleteExpenseById(int userId, int expenseId) async {
   try {
-
     final url = Uri.parse('$API_BASE/expenses/$userId/$expenseId');
-   
     final res = await http.delete(url);
-
     if (res.statusCode == 200 || res.statusCode == 204) return true;
-    if (res.statusCode == 404) {
-      print('No expense with id $expenseId');
-      return false;
-    }
+    if (res.statusCode == 404) { print('No expense with id $expenseId'); return false; }
     print('Error: ${res.statusCode} ${res.body}');
     return false;
-  } catch (e) {
-    print('Delete failed: $e');
-    return false;
-  }
+  } catch (e) { print('Delete failed: $e'); return false; }
 }
+
