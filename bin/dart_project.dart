@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'dart:io';
+import 'dart:io' show stdin, stdout;
 
 void main() async {
   print('===== Login =====');
