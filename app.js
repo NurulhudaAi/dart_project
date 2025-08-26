@@ -66,7 +66,26 @@ app.get('/expenses/:userId/today', (req, res) => {
 })
 
 // endpoint for Search expenses by item name
+// GET /expenses/:userId/search?q=coffee
+app.get('/expenses/:userId/search', (req, res) => {
+  const userId = req.params.userId;
+  const q = (req.query.q || '').trim();
+  if (!q) return res.status(400).send('Missing search keyword');
 
+  const like = `%${q}%`;
+  const sql = `
+    SELECT id, item, paid,
+           DATE_FORMAT(date, "%Y-%m-%d %H:%i:%s.000") AS date
+    FROM expense
+    WHERE user_id = ? AND item LIKE ?
+    ORDER BY date DESC
+  `;
+  conn.query(sql, [userId, like], (err, results) => {
+    if (err) return res.status(500).send('Database error!');
+    if (!results.length) return res.status(404).send('No matching expenses.');
+    res.status(200).json(results);
+  });
+});
 
 
 
