@@ -154,12 +154,18 @@ Future<void> searchExpenses(int userId) async {
 
 
   // Use 'q' as the query parameter
-  final url = Uri.parse(
-    '$API_BASE/expenses/$userId/search',
-  ).replace(queryParameters: {'q': keyword});
+  // ...existing code...
+Future<void> searchExpenses(int userId) async {
+  stdout.write('Item to search: ');
+  final keyword = stdin.readLineSync()?.trim() ?? '';
+
+  if (keyword.isEmpty) {
+    print('Keyword cannot be empty');
+    return;
+  }
+
   // Use only one correct URL, with 'q' as the query parameter
   final url = Uri.parse('$API_BASE/expenses/$userId/search').replace(queryParameters: {'q': keyword});
-
 
   try {
     final res = await http.get(url);
@@ -172,10 +178,7 @@ Future<void> searchExpenses(int userId) async {
       }
 
       if (data.isEmpty) {
-        print('No item: $keyword');
-
         print('No item containing that searching keyword.');
-
         return;
       }
 
@@ -197,7 +200,7 @@ Future<void> searchExpenses(int userId) async {
       }
       print('Total expenses matching "$keyword" = ${total}฿');
     } else if (res.statusCode == 404) {
-      print('No item: $keyword');
+      print('No item containing that searching keyword.');
     } else if (res.statusCode == 400) {
       print('Missing or invalid keyword.');
     } else {
@@ -207,6 +210,7 @@ Future<void> searchExpenses(int userId) async {
     print('Search failed: $e');
   }
 }
+// ...existing code...
 // ...existing code...
 
 // function for Add new expense
