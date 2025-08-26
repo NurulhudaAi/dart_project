@@ -174,45 +174,37 @@ Future<void> searchExpenses(int userId) async {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // function for Add new expense
+Future<void> addExpense(int userId) async {
+  print('===== Add new item =====');
+  stdout.write('Item: ');
+  final item = (stdin.readLineSync() ?? '').trim();
+  stdout.write('Paid: ');
+  final paidStr = (stdin.readLineSync() ?? '').trim();
+  final paid = int.tryParse(paidStr) ?? -1;
 
+  if (item.isEmpty || paid < 0) {
+    print('Invalid input');
+    return;
+  }
 
+  final url = Uri.parse('http://127.0.0.1:8000/expenses'); 
+  final response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'item': item,
+      'paid': paid,
+      'user_id': userId,
+    }),
+  );
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  if (response.statusCode == 201 || response.statusCode == 200) {
+    print('Inserted!');
+  } else {
+    print('Insert failed: ${response.statusCode} ${response.body}');
+  }
+}
 
 // Fuction for Delte expense by id
 Future<bool> deleteExpenseById(int userId, int expenseId) async {

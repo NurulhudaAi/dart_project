@@ -78,17 +78,30 @@ app.get('/expenses/:userId/today', (req, res) => {
 
 
 // endponint for add new expense
+app.post('/expenses', (req, res) => {
+  const { item, paid, user_id } = req.body;
 
+  // validate เบื้องต้น
+  if (!item || item.trim() === '' || paid === undefined || user_id === undefined) {
+    return res.status(400).send('Missing required fields (item, paid, user_id)');
+  }
 
-
-
-
-
-
-
-
-
-
-
+  const sql = 'INSERT INTO expense (item, paid, date, user_id) VALUES (?, ?, NOW(), ?)';
+  conn.query(sql, [item.trim(), Number(paid), Number(user_id)], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Database error!');
+    }
+    // ส่งข้อมูลรายการที่เพิ่งสร้างกลับไป
+    res.status(201).json({
+      id: result.insertId,
+      item: item.trim(),
+      paid: Number(paid),
+      user_id: Number(user_id),
+      // ให้รูปแบบเวลา ISO (ฝั่ง Dart แปลงได้)
+      date: new Date().toISOString()
+    });
+  });
+});
 
 // endpoint for delete expense by id
