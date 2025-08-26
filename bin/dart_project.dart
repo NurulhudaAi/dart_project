@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:io';
+
 const String API_BASE = 'http://localhost:8000';
 
 void main() async {
@@ -141,27 +142,41 @@ Future<void> showTodayExpenses(int userId) async {
 }
 
 // function for Search expenses by keyword
+// function for Search expenses by keyword  (ตามข้อ 3 ของโจทย์)
 Future<void> searchExpenses(int userId) async {
   stdout.write('Enter keyword to search: ');
-  String? keyword = stdin.readLineSync()?.trim();
+  final keyword = stdin.readLineSync()?.trim() ?? '';
 
-  if (keyword == null || keyword.isEmpty) {
+  if (keyword.isEmpty) {
     print('Keyword cannot be empty');
     return;
   }
 
+
+  // Server spec: GET /expenses/:userId/search?q=keyword
+  final url = Uri.parse(
+    '$API_BASE/expenses/$userId/search',
+  ).replace(queryParameters: {'q': keyword});
   final url = Uri.parse(
     'http://localhost:8000/expenses/$userId/search?keyword=$keyword',
   );
   final response = await http.get(url);
 
-  if (response.statusCode == 200) {
-    final jsonResult = jsonDecode(response.body) as List;
+  try {
+    final res = await http.get(url);
 
-    if (jsonResult.isEmpty) {
-      print('No expenses found matching the keyword "$keyword".');
-      return;
-    }
+    if (res.statusCode == 200) {
+      final data = jsonDecode(res.body);
+      if (data is! List) {
+        print('Unexpected response format');
+        return;
+      }
+
+      if (data.isEmpty) {
+        // กรณีไม่พบ (กันไว้ แม้ฝั่งเซิร์ฟเวอร์จะส่ง 404)
+        print('No item containing that searching keyword.');
+        return;
+      }
 
     int total = 0;
     print(
@@ -170,16 +185,36 @@ Future<void> searchExpenses(int userId) async {
     for (var exp in jsonResult) {
       final dt = DateTime.parse(exp["date"]);
       final dtaLocal = dt.toLocal();
+      
       print(
-        '${exp["id"]}. ${exp["item"]} : ${exp["paid"]}฿ : ${dtaLocal.toString()}',
+        '---------------------- Search results for "$keyword" ----------------------',
       );
-      total += exp['paid'] as int;
+      for (final exp in data) {
+        final id = exp['id'];
+        final item = exp['item'];
+        final paid = (exp['paid'] is int)
+            ? exp['paid'] as int
+            : int.tryParse('${exp['paid']}') ?? 0;
+
+        // MySQL รูปแบบ "YYYY-MM-DD HH:mm:ss.000" -> แปลงให้อ่านได้
+        final dateStr = '${exp['date']}';
+        DateTime? dt = DateTime.tryParse(dateStr.replaceFirst(' ', 'T'));
+        final shown = (dt != null) ? dt.toLocal().toString() : dateStr;
+
+        print('$id. $item : ${paid}฿ : $shown');
+        total += paid;
+      }
+      print('Total expenses matching "$keyword" = ${total}฿');
+    } else if (res.statusCode == 404) {
+      // เมื่อไม่พบรายการตามสเปกงาน
+      print('No item containing that searching keyword.');
+    } else if (res.statusCode == 400) {
+      print('Missing or invalid keyword.');
+    } else {
+      print('Error: ${res.statusCode} ${res.body}');
     }
-    print('Total expenses matching "$keyword" = $total฿');
-  } else if (response.statusCode == 404) {
-    print('No expenses found matching the keyword "$keyword".');
-  } else {
-    print('Error: ${response.statusCode}');
+  } catch (e) {
+    print('Search failed: $e');
   }
 }
 
@@ -196,7 +231,8 @@ Future<void> addExpense(int userId) async {
     print('Invalid input');
     return;
   }
-
+  
+  final url = Uri.parse('http://127.0.0.1:8000/expenses');
   final url = Uri.parse('$API_BASE/expenses'); 
 
   final response = await http.post(

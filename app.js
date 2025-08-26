@@ -66,10 +66,9 @@ app.get('/expenses/:userId/today', (req, res) => {
 })
 
 // endpoint for Search expenses by item name
-// GET /expenses/:userId/search?q=coffee
 app.get('/expenses/:userId/search', (req, res) => {
   const userId = req.params.userId;
-  const q = (req.query.q || '').trim();
+  const q = (req.query.q || req.query.keyword || '').trim();
   if (!q) return res.status(400).send('Missing search keyword');
 
   const like = `%${q}%`;
@@ -82,7 +81,10 @@ app.get('/expenses/:userId/search', (req, res) => {
   `;
   conn.query(sql, [userId, like], (err, results) => {
     if (err) return res.status(500).send('Database error!');
-    if (!results.length) return res.status(404).send('No matching expenses.');
+    if (!results.length) {
+      // ให้ข้อความตามที่โจทย์ต้องการ
+      return res.status(404).send('No item containing that searching keyword.');
+    }
     res.status(200).json(results);
   });
 });
