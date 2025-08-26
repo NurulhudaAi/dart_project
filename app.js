@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const brcypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 const conn = require('./db');
 
 app.use(express.json());
@@ -132,7 +132,7 @@ app.delete('/expenses/:userId/:expenseId', (req, res) => {
   conn.query(sql, [userId, expenseId], (err, result) => {
     if (err) return res.status(500).json({ error: 'Database error' });
     if (result.affectedRows === 0) return res.status(404).send('Not found');
-    return res.status(204).send();
+    return res.status(200).json({ message: 'Expense deleted' }); // fixed response
   });
 });
 
