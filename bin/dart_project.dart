@@ -141,20 +141,7 @@ Future<void> showTodayExpenses(int userId) async {
 }
 
 // function for Search expenses by keyword
-// function for Search expenses by keyword  (ตามข้อ 3 ของโจทย์)
-// ...existing code...
-Future<void> searchExpenses(int userId) async {
-  stdout.write('Item to search: ');
-  final keyword = stdin.readLineSync()?.trim() ?? '';
-
-  if (keyword.isEmpty) {
-    print('Keyword cannot be empty');
-    return;
-  }
-
-
   // Use 'q' as the query parameter
-  // ...existing code...
 Future<void> searchExpenses(int userId) async {
   stdout.write('Item to search: ');
   final keyword = stdin.readLineSync()?.trim() ?? '';
