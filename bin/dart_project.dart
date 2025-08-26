@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:io';
+
 const String API_BASE = 'http://localhost:8000';
 
 void main() async {
@@ -144,7 +145,9 @@ Future<void> searchExpenses(int userId) async {
     return;
   }
 
-  final url = Uri.parse('http://localhost:8000/expenses/$userId/search/$keyword');
+  final url = Uri.parse(
+    'http://localhost:8000/expenses/$userId/search/$keyword',
+  );
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
@@ -156,7 +159,9 @@ Future<void> searchExpenses(int userId) async {
     }
 
     int total = 0;
-    print('---------------------- Search results for "$keyword" ----------------------');
+    print(
+      '---------------------- Search results for "$keyword" ----------------------',
+    );
     for (var exp in jsonResult) {
       final dt = DateTime.parse(exp["date"]);
       final dtaLocal = dt.toLocal();
@@ -188,15 +193,11 @@ Future<void> addExpense(int userId) async {
     return;
   }
 
-  final url = Uri.parse('http://127.0.0.1:8000/expenses'); 
+  final url = Uri.parse('http://127.0.0.1:8000/expenses');
   final response = await http.post(
     url,
     headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({
-      'item': item,
-      'paid': paid,
-      'user_id': userId,
-    }),
+    body: jsonEncode({'item': item, 'paid': paid, 'user_id': userId}),
   );
 
   if (response.statusCode == 201 || response.statusCode == 200) {
@@ -209,9 +210,8 @@ Future<void> addExpense(int userId) async {
 // Fuction for Delte expense by id
 Future<bool> deleteExpenseById(int userId, int expenseId) async {
   try {
-
     final url = Uri.parse('$API_BASE/expenses/$userId/$expenseId');
-   
+
     final res = await http.delete(url);
 
     if (res.statusCode == 200 || res.statusCode == 204) return true;
