@@ -145,7 +145,7 @@ Future<void> showTodayExpenses(int userId) async {
 // function for Search expenses by keyword  (ตามข้อ 3 ของโจทย์)
 // ...existing code...
 Future<void> searchExpenses(int userId) async {
-  stdout.write('Enter keyword to search: ');
+  stdout.write('Item to search: ');
   final keyword = stdin.readLineSync()?.trim() ?? '';
 
   if (keyword.isEmpty) {
@@ -169,7 +169,7 @@ Future<void> searchExpenses(int userId) async {
       }
 
       if (data.isEmpty) {
-        print('No item containing that searching keyword.');
+        print('No item: $keyword');
         return;
       }
 
@@ -193,7 +193,7 @@ Future<void> searchExpenses(int userId) async {
       }
       print('Total expenses matching "$keyword" = ${total}฿');
     } else if (res.statusCode == 404) {
-      print('No item containing that searching keyword.');
+      print('No item: $keyword');
     } else if (res.statusCode == 400) {
       print('Missing or invalid keyword.');
     } else {
