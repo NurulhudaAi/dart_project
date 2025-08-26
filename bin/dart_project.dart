@@ -187,17 +187,3 @@ Future<bool> deleteExpenseById(int userId, int expenseId) async {
     return false;
   }
 }
-
-Future<void> menuDeleteExpense(int userId) async {
-  stdout.write('Enter expense ID to delete: ');
-  final id = int.tryParse(stdin.readLineSync()?.trim() ?? '');
-  if (id == null) {
-    print('Invalid ID.');
-    return;
-  }
-
-  final ok = await deleteExpenseById(userId, id); 
-  if (ok) print('Deleted expense id $id');
-
-  await showAllExpenses(userId);
-}
