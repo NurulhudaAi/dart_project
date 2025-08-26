@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:io';
+const String API_BASE = 'http://localhost:8000';
 
 const String API_BASE = 'http://localhost:8000';
 
@@ -198,7 +199,8 @@ Future<void> addExpense(int userId) async {
     return;
   }
 
-  final url = Uri.parse('$API_BASE/expenses');
+  final url = Uri.parse('$API_BASE/expenses'); 
+
   final response = await http.post(
     url,
     headers: {'Content-Type': 'application/json'},
