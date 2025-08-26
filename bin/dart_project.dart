@@ -68,11 +68,17 @@ Future<void> showTrackingApp(int userId, String username) async {
         await searchExpenses(userId);
         break;
       case '4':
-        // await addNewExpense(userId);
-        print('Feature not implemented yet.');
+        await addExpense(userId);
         break;
       case '5':
-        await deleteExpenseById(userId);
+        stdout.write('Enter expense ID to delete: ');
+        String? idStr = stdin.readLineSync()?.trim();
+        int? expenseId = int.tryParse(idStr ?? '');
+        if (expenseId == null) {
+          print('Invalid expense ID');
+          break;
+        }
+        await deleteExpenseById(userId, expenseId);
         break;
       case '6':
         print('----- Bye -----');
@@ -146,10 +152,15 @@ Future<void> searchExpenses(int userId) async {
     return;
   }
 
+
   // Server spec: GET /expenses/:userId/search?q=keyword
   final url = Uri.parse(
     '$API_BASE/expenses/$userId/search',
   ).replace(queryParameters: {'q': keyword});
+  final url = Uri.parse(
+    'http://localhost:8000/expenses/$userId/search?keyword=$keyword',
+  );
+  final response = await http.get(url);
 
   try {
     final res = await http.get(url);
@@ -167,7 +178,14 @@ Future<void> searchExpenses(int userId) async {
         return;
       }
 
-      int total = 0;
+    int total = 0;
+    print(
+      '---------------------- Search results for "$keyword" ----------------------',
+    );
+    for (var exp in jsonResult) {
+      final dt = DateTime.parse(exp["date"]);
+      final dtaLocal = dt.toLocal();
+      
       print(
         '---------------------- Search results for "$keyword" ----------------------',
       );
@@ -213,8 +231,10 @@ Future<void> addExpense(int userId) async {
     print('Invalid input');
     return;
   }
-
+  
   final url = Uri.parse('http://127.0.0.1:8000/expenses');
+  final url = Uri.parse('$API_BASE/expenses'); 
+
   final response = await http.post(
     url,
     headers: {'Content-Type': 'application/json'},
