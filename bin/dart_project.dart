@@ -63,6 +63,16 @@ Future<void> showTrackingApp(int userId, String username) async {
         await showTodayExpenses(userId);
         break;
       case '3':
+        await searchExpenses(userId);
+        break;
+      case '4':
+        // await addNewExpense(userId);
+        print('Feature not implemented yet.');
+        break;
+      case '5':
+        await deleteExpenseById(userId);
+        break;
+      case '6':
         print('----- Bye -----');
         return;
       default:
