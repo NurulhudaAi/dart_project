@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:io';
 const String API_BASE = 'http://localhost:8000';
 
+
 void main() async {
   print('===== Login =====');
   // Get username and password
@@ -134,10 +135,9 @@ Future<void> showTodayExpenses(int userId) async {
 }
 
 // function for Search expenses by keyword
-// function for Search expenses by keyword  (ตามข้อ 3 ของโจทย์)
-// ...existing code...
+  // Use 'q' as the query parameter
 Future<void> searchExpenses(int userId) async {
-  stdout.write('Enter keyword to search: ');
+  stdout.write('Item to search: ');
   final keyword = stdin.readLineSync()?.trim() ?? '';
 
   if (keyword.isEmpty) {
@@ -192,6 +192,7 @@ Future<void> searchExpenses(int userId) async {
   }
 }
 // ...existing code...
+// ...existing code...
 
 // function for Add new expense
 Future<void> addExpense(int userId) async {
@@ -206,7 +207,7 @@ Future<void> addExpense(int userId) async {
     print('Invalid input');
     return;
   }
-  
+
   final url = Uri.parse('http://127.0.0.1:8000/expenses');
 
   final response = await http.post(
@@ -215,7 +216,7 @@ Future<void> addExpense(int userId) async {
     body: jsonEncode({'item': item, 'paid': paid, 'user_id': userId}),
   );
 
-  if (response.statusCode == 201 || response.statusCode == 200) {
+  if (response.statusCode == 200) {
     print('Inserted!');
   } else {
     print('Insert failed: ${response.statusCode} ${response.body}');
