@@ -40,7 +40,7 @@ app.post('/login', (req, res) => {
 //endpoint for each userid's expenses
 app.get('/expenses/:userId', (req, res) => {
   const userId = req.params.userId;
-  const sql = 'SELECT item, paid, DATE_FORMAT(date, "%Y-%m-%d %H:%i:%s.000") as date FROM expense WHERE user_id = ?';
+  const sql = 'SELECT id, item, paid, DATE_FORMAT(date, "%Y-%m-%d %H:%i:%s.000") as date FROM expense WHERE user_id = ?';
 
 
   conn.query(sql, [userId], (err, results) => {
@@ -55,7 +55,7 @@ app.get('/expenses/:userId', (req, res) => {
 // endpoint for today's user expenses
 app.get('/expenses/:userId/today', (req, res) => {
   const userId = req.params.userId;
-  const sql = 'SELECT item, paid, DATE_FORMAT(date, "%Y-%m-%d %H:%i:%s.000") as date FROM expense WHERE user_id = ? AND DATE(date) = CURDATE()';
+  const sql = 'SELECT id, item, paid, DATE_FORMAT(date, "%Y-%m-%d %H:%i:%s.000") as date FROM expense WHERE user_id = ? AND DATE(date) = CURDATE()';
 
   conn.query(sql, [userId], (err, results) => {
     if (err) {
@@ -66,7 +66,26 @@ app.get('/expenses/:userId/today', (req, res) => {
 })
 
 // endpoint for Search expenses by item name
+// GET /expenses/:userId/search?q=coffee
+app.get('/expenses/:userId/search', (req, res) => {
+  const userId = req.params.userId;
+  const q = (req.query.q || '').trim();
+  if (!q) return res.status(400).send('Missing search keyword');
 
+  const like = `%${q}%`;
+  const sql = `
+    SELECT id, item, paid,
+           DATE_FORMAT(date, "%Y-%m-%d %H:%i:%s.000") AS date
+    FROM expense
+    WHERE user_id = ? AND item LIKE ?
+    ORDER BY date DESC
+  `;
+  conn.query(sql, [userId, like], (err, results) => {
+    if (err) return res.status(500).send('Database error!');
+    if (!results.length) return res.status(404).send('No matching expenses.');
+    res.status(200).json(results);
+  });
+});
 
 
 
@@ -104,4 +123,13 @@ app.post('/expenses', (req, res) => {
   });
 });
 
-// endpoint for delete expense by id
+// DELETE EXPENSE 
+app.delete('/expenses/:userId/:expenseId', (req, res) => {
+  const { userId, expenseId } = req.params;
+  const sql = 'DELETE FROM expense WHERE user_id = ? AND id = ?';
+  conn.query(sql, [userId, expenseId], (err, result) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    if (result.affectedRows === 0) return res.status(404).send('Not found');
+    return res.status(204).send(); 
+  });
+});

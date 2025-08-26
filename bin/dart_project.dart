@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:io';
 const String API_BASE = 'http://localhost:8000';
 
+const String API_BASE = 'http://localhost:8000';
+
 void main() async {
   print('===== Login =====');
   // Get username and password
@@ -47,9 +49,12 @@ Future<void> showTrackingApp(int userId, String username) async {
   while (true) {
     print('================== Expenses Tracking App ==================');
     print('Welcome $username');
-    print('1. All expenses');
-    print('2. Today\'s expenses');
-    print('3. Exit');
+    print('1. All expense');
+    print('2. Today\'s expense');
+    print('3. Search expense');
+    print('4. Add new expense');
+    print('5. Delete an expense');
+    print('6. Exit');
     stdout.write('Choose... ');
     String? choice = stdin.readLineSync()?.trim();
 
@@ -61,6 +66,22 @@ Future<void> showTrackingApp(int userId, String username) async {
         await showTodayExpenses(userId);
         break;
       case '3':
+        await searchExpenses(userId);
+        break;
+      case '4':
+        await addExpense(userId);
+        break;
+      case '5':
+        stdout.write('Enter expense ID to delete: ');
+        String? idStr = stdin.readLineSync()?.trim();
+        int? expenseId = int.tryParse(idStr ?? '');
+        if (expenseId == null) {
+          print('Invalid expense ID');
+          break;
+        }
+        await deleteExpenseById(userId, expenseId);
+        break;
+      case '6':
         print('----- Bye -----');
         return;
       default:
@@ -122,7 +143,47 @@ Future<void> showTodayExpenses(int userId) async {
 }
 
 // function for Search expenses by keyword
+Future<void> searchExpenses(int userId) async {
+  stdout.write('Enter keyword to search: ');
+  String? keyword = stdin.readLineSync()?.trim();
 
+  if (keyword == null || keyword.isEmpty) {
+    print('Keyword cannot be empty');
+    return;
+  }
+
+  final url = Uri.parse(
+    'http://localhost:8000/expenses/$userId/search?keyword=$keyword',
+  );
+  final response = await http.get(url);
+
+  if (response.statusCode == 200) {
+    final jsonResult = jsonDecode(response.body) as List;
+
+    if (jsonResult.isEmpty) {
+      print('No expenses found matching the keyword "$keyword".');
+      return;
+    }
+
+    int total = 0;
+    print(
+      '---------------------- Search results for "$keyword" ----------------------',
+    );
+    for (var exp in jsonResult) {
+      final dt = DateTime.parse(exp["date"]);
+      final dtaLocal = dt.toLocal();
+      print(
+        '${exp["id"]}. ${exp["item"]} : ${exp["paid"]}฿ : ${dtaLocal.toString()}',
+      );
+      total += exp['paid'] as int;
+    }
+    print('Total expenses matching "$keyword" = $total฿');
+  } else if (response.statusCode == 404) {
+    print('No expenses found matching the keyword "$keyword".');
+  } else {
+    print('Error: ${response.statusCode}');
+  }
+}
 
 // function for Add new expense
 Future<void> addExpense(int userId) async {
@@ -139,14 +200,11 @@ Future<void> addExpense(int userId) async {
   }
 
   final url = Uri.parse('$API_BASE/expenses'); 
+
   final response = await http.post(
     url,
     headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({
-      'item': item,
-      'paid': paid,
-      'user_id': userId,
-    }),
+    body: jsonEncode({'item': item, 'paid': paid, 'user_id': userId}),
   );
 
   if (response.statusCode == 201 || response.statusCode == 200) {
@@ -157,3 +215,21 @@ Future<void> addExpense(int userId) async {
 }
 
 // Fuction for Delte expense by id
+Future<bool> deleteExpenseById(int userId, int expenseId) async {
+  try {
+    final url = Uri.parse('$API_BASE/expenses/$userId/$expenseId');
+
+    final res = await http.delete(url);
+
+    if (res.statusCode == 200 || res.statusCode == 204) return true;
+    if (res.statusCode == 404) {
+      print('No expense with id $expenseId');
+      return false;
+    }
+    print('Error: ${res.statusCode} ${res.body}');
+    return false;
+  } catch (e) {
+    print('Delete failed: $e');
+    return false;
+  }
+}
