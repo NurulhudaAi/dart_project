@@ -127,12 +127,16 @@ app.post('/expenses', (req, res) => {
 
 // DELETE EXPENSE 
 app.delete('/expenses/:userId/:expenseId', (req, res) => {
-  const { userId, expenseId } = req.params;
+  const uid = Number(req.params.userId);
+  const eid = Number(req.params.expenseId);
+  if (!Number.isInteger(uid) || !Number.isInteger(eid)) {
+    return res.status(400).json({ error: 'Bad id', uid, eid });
+  }
   const sql = 'DELETE FROM expense WHERE user_id = ? AND id = ?';
-  conn.query(sql, [userId, expenseId], (err, result) => {
+  conn.query(sql, [uid, eid], (err, result) => {
     if (err) return res.status(500).json({ error: 'Database error' });
     if (result.affectedRows === 0) return res.status(404).send('Not found');
-    return res.status(200).json({ message: 'Expense deleted' }); // fixed response
+    return res.status(200).json({ deletedId: eid });
+
   });
 });
-

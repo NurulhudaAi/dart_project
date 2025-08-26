@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:io';
-const API_BASE = 'http://localhost:8000';
+const String API_BASE = 'http://localhost:8000';
+
 
 void main() async {
   print('===== Login =====');
@@ -70,14 +71,7 @@ Future<void> showTrackingApp(int userId, String username) async {
         await addExpense(userId);
         break;
       case '5':
-        stdout.write('Enter expense ID to delete: ');
-        String? idStr = stdin.readLineSync()?.trim();
-        int? expenseId = int.tryParse(idStr ?? '');
-        if (expenseId == null) {
-          print('Invalid expense ID');
-          break;
-        }
-        await deleteExpenseById(userId, expenseId);
+        await deleteExpense(userId);
         break;
       case '6':
         print('----- Bye -----');
@@ -222,7 +216,7 @@ Future<void> addExpense(int userId) async {
     body: jsonEncode({'item': item, 'paid': paid, 'user_id': userId}),
   );
 
-  if (response.statusCode == 201 || response.statusCode == 200) {
+  if (response.statusCode == 200) {
     print('Inserted!');
   } else {
     print('Insert failed: ${response.statusCode} ${response.body}');
@@ -230,13 +224,28 @@ Future<void> addExpense(int userId) async {
 }
 
 // Fuction for Delte expense by id
-Future<bool> deleteExpenseById(int userId, int expenseId) async {
+Future<void> deleteExpense(int userId) async {
+  print('===== Delete an item =====');
+  stdout.write('Item id: ');
+  final idStr = stdin.readLineSync()?.trim();
+  final eid = int.tryParse(idStr ?? '');
+
+  if (eid == null) {
+    print('Invalid expense ID');
+    return;
+  }
   try {
-    final url = Uri.parse('$API_BASE/expenses/$userId/$expenseId');
+    final url = Uri.parse('$API_BASE/expenses/$userId/$eid');
     final res = await http.delete(url);
-    if (res.statusCode == 200 || res.statusCode == 204) return true;
-    if (res.statusCode == 404) { print('No expense with id $expenseId'); return false; }
-    print('Error: ${res.statusCode} ${res.body}');
-    return false;
-  } catch (e) { print('Delete failed: $e'); return false; }
+
+    if (res.statusCode == 200 || res.statusCode == 204) {
+      print('Deleted!');
+    } else if (res.statusCode == 404) {
+      print('No item: $eid');
+    } else {
+      print('Error: ${res.statusCode} ${res.body}');
+    }
+  } catch (e) {
+    print('Delete failed: $e');
+  }
 }
