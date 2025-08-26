@@ -137,7 +137,7 @@ Future<void> addExpense(int userId) async {
     return;
   }
 
-  final url = Uri.parse('http://localhost:8000/expenses'); 
+  final url = Uri.parse('http://127.0.0.1:8000/expenses'); 
   final response = await http.post(
     url,
     headers: {'Content-Type': 'application/json'},
