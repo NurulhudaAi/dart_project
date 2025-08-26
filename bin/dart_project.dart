@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:io';
+const String API_BASE = 'http://localhost:8000';
 
 void main() async {
   print('===== Login =====');
@@ -167,9 +168,11 @@ Future<void> showTodayExpenses(int userId) async {
 
 
 // Fuction for Delte expense by id
-Future<bool> deleteExpenseById(int expenseId) async {
+Future<bool> deleteExpenseById(int userId, int expenseId) async {
   try {
-    final url = Uri.parse('$API_BASE/expenses/$expenseId');
+
+    final url = Uri.parse('$API_BASE/expenses/$userId/$expenseId');
+   
     final res = await http.delete(url);
 
     if (res.statusCode == 200 || res.statusCode == 204) return true;
@@ -187,13 +190,13 @@ Future<bool> deleteExpenseById(int expenseId) async {
 
 Future<void> menuDeleteExpense(int userId) async {
   stdout.write('Enter expense ID to delete: ');
-  final id = int.tryParse(stdin.readLineSync() ?? '');
+  final id = int.tryParse(stdin.readLineSync()?.trim() ?? '');
   if (id == null) {
     print('Invalid ID.');
     return;
   }
 
-  final ok = await deleteExpenseById(id);
+  final ok = await deleteExpenseById(userId, id); 
   if (ok) print('Deleted expense id $id');
 
   await showAllExpenses(userId);
