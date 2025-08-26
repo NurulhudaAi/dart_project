@@ -2,9 +2,7 @@
 
 ## Team Members
 1. Nurulhuda Adam Ishaq 6631501067
-2.
-3.Noppamart Pengmanee 6631501060
-4.
+2.Noppamart Pengmanee 6631501060
 
 
 A sample command-line application with an entrypoint in `bin/`, library code
