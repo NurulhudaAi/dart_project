@@ -144,7 +144,7 @@ Future<void> searchExpenses(int userId) async {
     return;
   }
 
-  final url = Uri.parse('http://localhost:8000/expenses/$userId/search?keyword=$keyword');
+  final url = Uri.parse('http://localhost:8000/expenses/$userId/search/$keyword');
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
