@@ -121,6 +121,43 @@ Future<void> showTodayExpenses(int userId) async {
 }
 
 // function for Search expenses by keyword
+Future<void> searchExpenses(int userId) async {
+  stdout.write('Enter keyword to search: ');
+  String? keyword = stdin.readLineSync()?.trim();
+
+  if (keyword == null || keyword.isEmpty) {
+    print('Keyword cannot be empty');
+    return;
+  }
+
+  final url = Uri.parse('http://localhost:8000/expenses/$userId/search?keyword=$keyword');
+  final response = await http.get(url);
+
+  if (response.statusCode == 200) {
+    final jsonResult = jsonDecode(response.body) as List;
+
+    if (jsonResult.isEmpty) {
+      print('No expenses found matching the keyword "$keyword".');
+      return;
+    }
+
+    int total = 0;
+    print('---------------------- Search results for "$keyword" ----------------------');
+    for (var exp in jsonResult) {
+      final dt = DateTime.parse(exp["date"]);
+      final dtaLocal = dt.toLocal();
+      print(
+        '${exp["id"]}. ${exp["item"]} : ${exp["paid"]}฿ : ${dtaLocal.toString()}',
+      );
+      total += exp['paid'] as int;
+    }
+    print('Total expenses matching "$keyword" = $total฿');
+  } else if (response.statusCode == 404) {
+    print('No expenses found matching the keyword "$keyword".');
+  } else {
+    print('Error: ${response.statusCode}');
+  }
+}
 
 
 
