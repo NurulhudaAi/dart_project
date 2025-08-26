@@ -50,7 +50,7 @@ Future<void> showTrackingApp(int userId, String username) async {
     print('2. Today\'s expense');
     print('3. Search expense');
     print('4. Add new expense');
-    print('5. Delete an expense')
+    print('5. Delete an expense');
     print('6. Exit');
     stdout.write('Choose... ');
     String? choice = stdin.readLineSync()?.trim();
