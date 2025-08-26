@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:io';
+const String API_BASE = 'http://localhost:8000';
 
 void main() async {
   print('===== Login =====');
