@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 
-const String API_BASE = 'http://localhost:8000';
-
 void main() async {
   print('===== Login =====');
   // Get username and password
@@ -45,6 +43,7 @@ void main() async {
 // fuction Show Menu
 Future<void> showTrackingApp(int userId, String username) async {
   while (true) {
+    print('\n');
     print('================== Expenses Tracking App ==================');
     print('Welcome $username');
     print('1. All expense');
@@ -145,7 +144,8 @@ Future<void> searchExpenses(int userId) async {
   }
 
   // Use only one correct URL, with 'q' as the query parameter
-  final url = Uri.parse('http://localhost:8000/expenses/$userId/search',
+  final url = Uri.parse(
+    'http://localhost:8000/expenses/$userId/search',
   ).replace(queryParameters: {'q': keyword});
 
   try {
@@ -185,8 +185,6 @@ Future<void> searchExpenses(int userId) async {
     print('Search failed: $e');
   }
 }
-// ...existing code...
-// ...existing code...
 
 // function for Add new expense
 Future<void> addExpense(int userId) async {
@@ -203,7 +201,6 @@ Future<void> addExpense(int userId) async {
   }
 
   final url = Uri.parse('http://localhost:8000/expenses');
-
   final response = await http.post(
     url,
     headers: {'Content-Type': 'application/json'},
@@ -217,7 +214,7 @@ Future<void> addExpense(int userId) async {
   }
 }
 
-// Fuction for Delte expense by id
+// Fuction for Delete expense by id
 Future<void> deleteExpense(int userId) async {
   print('===== Delete an item =====');
   stdout.write('Item id: ');

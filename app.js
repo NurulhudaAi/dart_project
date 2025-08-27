@@ -66,6 +66,7 @@ app.get('/expenses/:userId/today', (req, res) => {
   });
 })
 
+
 // endpoint for Search expenses by item name
 app.get('/expenses/:userId/search', (req, res) => {
   const userId = req.params.userId;
@@ -83,7 +84,6 @@ app.get('/expenses/:userId/search', (req, res) => {
   conn.query(sql, [userId, like], (err, results) => {
     if (err) return res.status(500).send('Database error!');
     if (!results.length) {
-      // ให้ข้อความตามที่โจทย์ต้องการ
       return res.status(404).send('No item containing that searching keyword.');
     }
     res.status(200).json(results);
@@ -91,19 +91,10 @@ app.get('/expenses/:userId/search', (req, res) => {
 });
 
 
-
-
-
-
-
-
-
-
 // endponint for add new expense
 app.post('/expenses', (req, res) => {
   const { item, paid, user_id } = req.body;
 
-  // validate เบื้องต้น
   if (!item || item.trim() === '' || paid === undefined || user_id === undefined) {
     return res.status(400).send('Missing required fields (item, paid, user_id)');
   }
@@ -114,19 +105,18 @@ app.post('/expenses', (req, res) => {
       console.error(err);
       return res.status(500).send('Database error!');
     }
-    // ส่งข้อมูลรายการที่เพิ่งสร้างกลับไป
     res.status(201).json({
       id: result.insertId,
       item: item.trim(),
       paid: Number(paid),
       user_id: Number(user_id),
-      // ให้รูปแบบเวลา ISO (ฝั่ง Dart แปลงได้)
       date: new Date().toISOString()
     });
   });
 });
 
-// DELETE EXPENSE 
+
+// endpoint for delete expense by id 
 app.delete('/expenses/:userId/:expenseId', (req, res) => {
   const uid = Number(req.params.userId);
   const eid = Number(req.params.expenseId);
