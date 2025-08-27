@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:io';
-const String API_BASE = 'http://localhost:8000';
 
+const String API_BASE = 'http://localhost:8000';
 
 void main() async {
   print('===== Login =====');
@@ -27,7 +27,6 @@ void main() async {
 
   if (response.statusCode == 200) {
     final result = jsonDecode(response.body) as Map<String, dynamic>;
-    print(result);
 
     // Get userId from response
     final userId = result['userId'];
@@ -135,7 +134,7 @@ Future<void> showTodayExpenses(int userId) async {
 }
 
 // function for Search expenses by keyword
-  // Use 'q' as the query parameter
+// Use 'q' as the query parameter
 Future<void> searchExpenses(int userId) async {
   stdout.write('Item to search: ');
   final keyword = stdin.readLineSync()?.trim() ?? '';
@@ -146,7 +145,8 @@ Future<void> searchExpenses(int userId) async {
   }
 
   // Use only one correct URL, with 'q' as the query parameter
-  final url = Uri.parse('$API_BASE/expenses/$userId/search').replace(queryParameters: {'q': keyword});
+  final url = Uri.parse('http://localhost:8000/expenses/$userId/search',
+  ).replace(queryParameters: {'q': keyword});
 
   try {
     final res = await http.get(url);
@@ -164,7 +164,9 @@ Future<void> searchExpenses(int userId) async {
       }
 
       int total = 0;
-      print('---------------------- Search results for "$keyword" ----------------------');
+      print(
+        '---------------------- Search results for "$keyword" ----------------------',
+      );
       for (var exp in data) {
         final id = exp['id'];
         final item = exp['item'];
@@ -208,7 +210,7 @@ Future<void> addExpense(int userId) async {
     return;
   }
 
-  final url = Uri.parse('http://127.0.0.1:8000/expenses');
+  final url = Uri.parse('http://localhost:8000/expenses');
 
   final response = await http.post(
     url,
@@ -216,7 +218,7 @@ Future<void> addExpense(int userId) async {
     body: jsonEncode({'item': item, 'paid': paid, 'user_id': userId}),
   );
 
-  if (response.statusCode == 200) {
+  if (response.statusCode == 201) {
     print('Inserted!');
   } else {
     print('Insert failed: ${response.statusCode} ${response.body}');
@@ -235,7 +237,7 @@ Future<void> deleteExpense(int userId) async {
     return;
   }
   try {
-    final url = Uri.parse('$API_BASE/expenses/$userId/$eid');
+    final url = Uri.parse('http://localhost:8000/expenses/$userId/$eid');
     final res = await http.delete(url);
 
     if (res.statusCode == 200 || res.statusCode == 204) {
