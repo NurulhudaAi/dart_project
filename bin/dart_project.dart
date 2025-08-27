@@ -173,7 +173,6 @@ Future<void> searchExpenses(int userId) async {
         print('$id. $item : ${paid}฿ : $shown');
         total += paid;
       }
-      print('Total expenses matching "$keyword" = ${total}฿');
     } else if (res.statusCode == 404) {
       print('No item: $keyword');
     } else if (res.statusCode == 400) {
