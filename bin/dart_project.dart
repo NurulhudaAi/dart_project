@@ -158,15 +158,7 @@ Future<void> searchExpenses(int userId) async {
         return;
       }
 
-      if (data.isEmpty) {
-        print('No item containing that searching keyword.');
-        return;
-      }
-
       int total = 0;
-      print(
-        '---------------------- Search results for "$keyword" ----------------------',
-      );
       for (var exp in data) {
         final id = exp['id'];
         final item = exp['item'];
@@ -183,7 +175,7 @@ Future<void> searchExpenses(int userId) async {
       }
       print('Total expenses matching "$keyword" = ${total}฿');
     } else if (res.statusCode == 404) {
-      print('No item containing that searching keyword.');
+      print('No item: $keyword');
     } else if (res.statusCode == 400) {
       print('Missing or invalid keyword.');
     } else {
