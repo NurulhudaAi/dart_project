@@ -16,7 +16,7 @@ app.listen(PORT, () => {
 app.post('/login', (req, res) => {
  const { username, password } = req.body;
  const sql = 'SELECT id, password FROM users WHERE username = ?';
- con.query(sql, [username], (err, results) => {
+ conn.query(sql, [username], (err, results) => {4
    if (err) {
      return res.status(500).send('Database error');
    }
